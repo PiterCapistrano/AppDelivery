@@ -11,9 +11,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.auth.api.identity.BeginSignInRequest;
+import com.google.android.gms.common.SignInButton;
+
 public class FormLogin extends AppCompatActivity {
 
     private TextView txt_cadastrar;
+    private SignInButton bt_google;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +40,17 @@ public class FormLogin extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        bt_google.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
     }
 
     public void IniciarComponentes(){
         txt_cadastrar = findViewById(R.id.txt_cadastrar);
-
+        bt_google = findViewById(R.id.bt_google);
 
     }
 }

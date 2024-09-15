@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "149409602754",
+    "project_id": "appdelivery-ddd36",
+    "storage_bucket": "appdelivery-ddd36.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:149409602754:android:d5f274157bb5fa64c96f5b",
+        "android_client_info": {
+          "package_name": "com.pitercapistrano.appdelivery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeXq1dCc6U8sBlcWRmRpguM_U9tSs08TM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
