@@ -54,7 +54,8 @@ public class ListaProdutos extends AppCompatActivity {
 
         // Verifica qual item foi selecionado e executa a ação correspondente
         if (itemId == R.id.perfil) {
-            // Ação para o item "Perfil" (ainda não implementada)
+            Intent intent = new Intent(ListaProdutos.this, PerfilUsuario.class);
+            startActivity(intent);
         } else if (itemId == R.id.pedidos) {
             // Ação para o item "Pedidos" (ainda não implementada)
         } else if (itemId == R.id.deslogar) {

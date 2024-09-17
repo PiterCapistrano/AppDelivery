@@ -2,6 +2,7 @@ package com.pitercapistrano.appdelivery;
 
 // Importa as bibliotecas necessárias
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,6 +28,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthCredential;
@@ -37,6 +40,15 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class FormLogin extends AppCompatActivity {
 
@@ -224,7 +236,7 @@ public class FormLogin extends AppCompatActivity {
                 Log.d(TAG, "Google Sign-In sucesso: " + account.getId());
 
                 // Autentica no Firebase com o token do Google
-                firebaseAuthWithGoogle(account.getIdToken());
+                firebaseAuthWithGoogle(account);
             } catch (Exception e) {
                 // Exibe uma mensagem de erro se o login falhar
                 Log.w(TAG, "Google Sign-In falhou.", e);
@@ -234,30 +246,65 @@ public class FormLogin extends AppCompatActivity {
     }
 
     // Autentica o usuário no Firebase com as credenciais do Google
-    private void firebaseAuthWithGoogle(String idToken) {
-        // Obtém as credenciais do Google para autenticar com Firebase
-        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    // Autenticação com sucesso, redireciona para a tela de produtos
-                    Log.d(TAG, "signInWithCredential: sucesso");
-                    progressBar.setVisibility(View.VISIBLE);
+    // Função para autenticar o usuário com Firebase usando a conta do Google
+    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+        Log.d(TAG, "Autenticando com Google:" + account.getId());
 
-                    // Aguarda 2 segundos antes de redirecionar para tela de produtos
-                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            IniciarTelaProdutos();
+        // Obtém as credenciais de autenticação do Google
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+
+        // Tenta autenticar com o Firebase
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Autenticação com sucesso, obtém o usuário do Firebase
+                            Log.d(TAG, "signInWithCredential:success");
+                            progressBar.setVisibility(View.VISIBLE);
+                            FirebaseUser user = mAuth.getCurrentUser();
+
+                            // Aguarda 2 segundos antes de redirecionar para tela de produtos
+                            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Salva os dados do usuário no Firestore
+                                    saveUserToFirestore(user);
+
+                                    // Redireciona para a tela de produtos
+                                    IniciarTelaProdutos();
+                                }
+                            },2000);
+                        } else {
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
                         }
-                    }, 2000);
-                } else {
-                    // Exibe uma mensagem de erro se a autenticação falhar
-                    Log.w(TAG, "signInWithCredential: falha", task.getException());
-                    txt_erro.setText("Falha na autenticação com Google.");
-                }
-            }
-        });
+                    }
+                });
+    }
+    // Função para salvar os dados do usuário no Firestore
+    private void saveUserToFirestore(FirebaseUser user) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Cria um mapa para armazenar os dados do usuário
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("nome", user.getDisplayName());
+        userMap.put("email", user.getEmail());
+        userMap.put("foto", user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : "");
+
+        // Salva os dados no Firestore com o ID do usuário
+        db.collection("Usuarios").document(user.getUid())
+                .set(userMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Dados do usuário salvos no Firestore.");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Erro ao salvar dados do usuário.", e);
+                    }
+                });
     }
 }

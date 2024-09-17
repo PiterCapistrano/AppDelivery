@@ -51,6 +51,8 @@ dependencies {
     implementation("androidx.credentials:credentials:1.5.0-alpha05")
     implementation("androidx.credentials:credentials-play-services-auth:1.5.0-alpha05")
 
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
