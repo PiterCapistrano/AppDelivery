@@ -1,6 +1,8 @@
 package com.pitercapistrano.appdelivery;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -40,6 +42,14 @@ public class PerfilUsuario extends AppCompatActivity {
         });
 
         IniciarComponentes();
+
+        bt_editar_perfil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(PerfilUsuario.this, EditarPerfil.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
