@@ -84,7 +84,7 @@ public class FormLogin extends AppCompatActivity {
                 String email = edit_email.getText().toString();
                 String senha = edit_senha.getText().toString();
 
-                if (email.isEmpty() || senha.isEmpty()){
+                if (email.isEmpty() || senha.isEmpty()) {
                     txt_erro.setText("Preencha todos os campos!");
                 } else {
                     txt_erro.setText("");
@@ -101,6 +101,7 @@ public class FormLogin extends AppCompatActivity {
         });
     }
 
+
     public void AutenticarUsuario(String email, String senha) {
         mAuth.signInWithEmailAndPassword(email, senha).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
@@ -114,21 +115,21 @@ public class FormLogin extends AppCompatActivity {
                             IniciarTelaProdutos();
                         }
                     }, 3000);
-                }else {
+                } else {
                     // Tratamento de erros com diferentes exceções específicas
                     String erro;
 
                     try {
                         throw task.getException();
-                    }catch(FirebaseAuthWeakPasswordException e){
+                    } catch (FirebaseAuthWeakPasswordException e) {
                         erro = "Coloque uma senha com no mínimo 6 caracteres!";
-                    }catch(FirebaseAuthInvalidCredentialsException e){
+                    } catch (FirebaseAuthInvalidCredentialsException e) {
                         erro = "E-mail inválido!";
-                    }catch(FirebaseAuthUserCollisionException e){
+                    } catch (FirebaseAuthUserCollisionException e) {
                         erro = "E-mail já cadastrado!";
-                    }catch(FirebaseNetworkException e){
+                    } catch (FirebaseNetworkException e) {
                         erro = "Sem conexão com a internet!";
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         erro = "Erro ao logar o usuário!";
                     }
                     // Exibe a mensagem de erro na interface
@@ -138,7 +139,7 @@ public class FormLogin extends AppCompatActivity {
         });
     }
 
-    public void IniciarTelaProdutos(){
+    public void IniciarTelaProdutos() {
         Intent intent = new Intent(FormLogin.this, ListaProdutos.class);
         startActivity(intent);
         finish(); // Fecha a activity atual para que o usuário não possa voltar
@@ -158,6 +159,7 @@ public class FormLogin extends AppCompatActivity {
     private void signInWithGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+
     }
 
     @Override
@@ -191,8 +193,17 @@ public class FormLogin extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     // Login com sucesso, direciona para a tela de produtos
                     Log.d(TAG, "signInWithCredential: sucesso");
-                    IniciarTelaProdutos();
+                    progressBar.setVisibility(View.VISIBLE);
+
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            IniciarTelaProdutos();
+                        }
+                    }, 3000);
+
                 } else {
+                    // Falha na autenticação com Firebase
                     Log.w(TAG, "signInWithCredential: falha", task.getException());
                     txt_erro.setText("Falha na autenticação com Google.");
                 }
