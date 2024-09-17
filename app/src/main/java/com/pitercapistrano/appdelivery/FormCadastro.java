@@ -173,6 +173,11 @@ public class FormCadastro extends AppCompatActivity {
 
     // Método para salvar os dados do usuário no Firebase Storage e Firestore
     public void SalvarDadosUsuario(){
+        // Verifica se o URI da imagem foi selecionado
+        if (mSelecionarUri == null) {
+            Log.e("Erro", "Nenhuma imagem selecionada");
+            return; // Se não houver imagem, interrompe o processo
+        }
         // Gera um nome único para o arquivo da imagem
         String nomeArquivo = UUID.randomUUID().toString();
 
@@ -222,6 +227,7 @@ public class FormCadastro extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // Tratamento de falhas ao obter a URL da imagem
+                        Log.i("storage_error", "Erro ao obter URL da imagem: " + e.toString()); // Log de erro
                     }
                 });
             }
@@ -229,6 +235,7 @@ public class FormCadastro extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
                 // Tratamento de falhas ao fazer upload da imagem
+                Log.i("upload_error", "Erro ao fazer upload da imagem: " + e.toString()); // Log de erro
             }
         });
     }
