@@ -139,13 +139,13 @@ public class FormLogin extends AppCompatActivity {
                     // Mostra o progresso de login
                     progressBar.setVisibility(View.VISIBLE);
 
-                    // Aguarda 3 segundos e redireciona para a tela de produtos
+                    // Aguarda 2 segundos e redireciona para a tela de produtos
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             IniciarTelaProdutos();
                         }
-                    }, 3000);
+                    }, 2000);
                 } else {
                     // Tratamento de erros de autenticação
                     String erro;
@@ -245,13 +245,13 @@ public class FormLogin extends AppCompatActivity {
                     Log.d(TAG, "signInWithCredential: sucesso");
                     progressBar.setVisibility(View.VISIBLE);
 
-                    // Aguarda 3 segundos antes de redirecionar para tela de produtos
+                    // Aguarda 2 segundos antes de redirecionar para tela de produtos
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             IniciarTelaProdutos();
                         }
-                    }, 3000);
+                    }, 2000);
                 } else {
                     // Exibe uma mensagem de erro se a autenticação falhar
                     Log.w(TAG, "signInWithCredential: falha", task.getException());
