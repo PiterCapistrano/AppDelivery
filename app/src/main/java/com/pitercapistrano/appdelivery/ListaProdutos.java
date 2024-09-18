@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -13,11 +15,29 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 // Importa a biblioteca de autenticação do Firebase
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.pitercapistrano.appdelivery.adapter.AdapterProduto;
+import com.pitercapistrano.appdelivery.model.Produto;
+import com.pitercapistrano.appdelivery.recyclerViewItemClickListener.RecyclerViewItemClickListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ListaProdutos extends AppCompatActivity {
+
+    private RecyclerView recyclerViewProdutos;
+    private AdapterProduto adapterProduto;
+    private List<Produto> produtoList;
+    private FirebaseFirestore db;
 
     // Função chamada quando a activity é criada
     @Override
@@ -36,6 +56,56 @@ public class ListaProdutos extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        recyclerViewProdutos = findViewById(R.id.recycler_view_produtos);
+        produtoList = new ArrayList<>();
+        adapterProduto = new AdapterProduto(getApplicationContext(), produtoList);
+        recyclerViewProdutos.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        recyclerViewProdutos.setHasFixedSize(true);
+        recyclerViewProdutos.setAdapter(adapterProduto);
+
+        //Evento de click no Recycler View
+        recyclerViewProdutos.addOnItemTouchListener(
+                new RecyclerViewItemClickListener(
+                        getApplicationContext(),
+                        recyclerViewProdutos,
+                        new RecyclerViewItemClickListener.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                Produto produto = produtoList.get(position);
+                                Toast.makeText(getApplicationContext(), produto.getNome(), Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onLongItemClick(View view, int position) {
+
+                            }
+
+                            @Override
+                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                            }
+                        }
+                )
+        );
+
+        db = FirebaseFirestore.getInstance();
+
+        db.collection("Produtos").orderBy("nome")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()){
+                                Produto produto = queryDocumentSnapshot.toObject(Produto.class);
+                                produtoList.add(produto);
+                                adapterProduto.notifyDataSetChanged();
+                            }
+                        }
+                    }
+                });
+
     }
 
     // Função para criar o menu na barra de opções
