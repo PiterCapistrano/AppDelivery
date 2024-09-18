@@ -72,8 +72,12 @@ public class ListaProdutos extends AppCompatActivity {
                         new RecyclerViewItemClickListener.OnItemClickListener() {
                             @Override
                             public void onItemClick(View view, int position) {
-                                Produto produto = produtoList.get(position);
-                                Toast.makeText(getApplicationContext(), produto.getNome(), Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(ListaProdutos.this, DetalhesProduto.class);
+                                intent.putExtra("foto", produtoList.get(position).getFoto());
+                                intent.putExtra("nome", produtoList.get(position).getNome());
+                                intent.putExtra("descricao", produtoList.get(position).getDescricao());
+                                intent.putExtra("preco", produtoList.get(position).getPreco());
+                                startActivity(intent);
                             }
 
                             @Override
